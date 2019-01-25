@@ -143,6 +143,10 @@ def configure_prefs():
          'Base URL for your local Software Update Service\n(Example: '
          'http://su.your.org -- leave empty if you are not replicating '
          'updates)'),
+        ('LocalCatalogSSLURLBase',
+         'Base SSL URL for your local Software Update Service\n(Example: '
+         'https://su.your.org -- OPTIONAL to replace any HTTPS URLs '
+         'leave empty for HTTP only)'),
         ]
     if not os.path.exists(pref('CurlPath')):
         keysAndPrompts.append(
@@ -330,7 +334,10 @@ def getLocalPathNameFromURL(url, root_dir=None):
 
 def rewriteOneURL(full_url):
     '''Rewrites a single URL to point to our local replica'''
-    our_base_url = pref('LocalCatalogURLBase')
+    if pref('LocalCatalogSSLURLBase') and full_url.startswith('https'):
+        our_base_url = pref('LocalCatalogSSLURLBase')
+    else:
+        our_base_url = pref('LocalCatalogURLBase')
     if not full_url.startswith(our_base_url):
         # only rewrite the URL if needed
         (unused_scheme, unused_netloc,
